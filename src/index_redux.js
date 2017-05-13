@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 
+//추가함
+import { connect, Provider   } from 'react-redux';
+
 
 /*
  * Action
@@ -59,7 +62,7 @@ class Form extends React.Component {
 
     submit(){
         let message = this.state.textInput;
-        this.props.store.dispatch( input(message) );
+        this.props.updateMessage( message );
     }
 
     render() {
@@ -72,32 +75,43 @@ class Form extends React.Component {
     }
 }
 
+let mapDispatchToProps = (dispatch) => {
+    return {
+        updateMessage : (value) => dispatch( input(value) )
+    }
+};
+Form = connect(undefined, mapDispatchToProps)(Form);
 
-const Answer = (props) => {
+
+let Answer = (props) => {
     return (
-        <h1>{ props.store.getState().message}</h1>
+        <h1>{ props.message}</h1>
     );
 };
 
+let mapStateToProps = (state) => {
+    return {
+        message: state.message
+    };
+}
  
+Answer = connect(mapStateToProps)(Answer);
+
 
 
 const App = () => {
     return (
         <div>
-            <Form store={store}/>
-            <Answer store={store}/>
+            <Form />
+            <Answer />
         </div>
     );
 };
 
 
-const render = () => {
-    const rootElement = document.getElementById('root');
-    ReactDOM.render(<App store={store}/>, rootElement); 
-};
-
-
-
-store.subscribe(render);
-render();
+const rootElement = document.getElementById('root');
+ReactDOM.render(
+    <Provider store = {store}>
+        <App />
+    </Provider>
+, rootElement);
